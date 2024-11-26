@@ -1,5 +1,8 @@
+import { getCurrentUser } from '@/firebase'
+import CrudView from '@/views/CrudView.vue'
+import HomeView from '@/views/HomeView.vue'
+import ProfileView from '@/views/ProfileView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 
 const routes = [
   {
@@ -8,18 +11,35 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+    path: '/crud',
+    name: 'crud',
+    component: CrudView,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: ProfileView,
+    meta: {
+      requiresAuth: true
+    }
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach( async(to, from, next) => {
+  const requiresAuth = to.matched.some( record => record.meta.requiresAuth)
+  if ( requiresAuth && !(await getCurrentUser()) ) {
+    next('/')
+  } else {
+    next()
+  }
 })
 
 export default router
