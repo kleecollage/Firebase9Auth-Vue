@@ -5,8 +5,14 @@
         FIREBASE - {{ userName }}
       </router-link>
       <div>
-        <button class="btn btn-info" @click="signIn" v-if="!isAuthenticated">Access</button>
-        <button class="btn btn-danger" @click="signOut" v-else>Exit</button>
+        <div >
+          <button v-if="!isAuthenticated" class="btn btn-info" @click="signIn">Access</button>
+          <div v-else>
+            <router-link to="/crud" class="btn btn-primary">CRUD</router-link>
+            <router-link to="/profile" class="btn btn-primary mx-2">Profile</router-link>
+            <button class="btn btn-danger" @click="signOut">Exit</button>
+          </div>
+        </div >
       </div>
     </div>
   </nav>
