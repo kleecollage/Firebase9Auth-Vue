@@ -1,6 +1,6 @@
 import { auth, timeStamp } from '@/firebase';
 import { useAuth } from '@vueuse/firebase';
-import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, getFirestore, query, updateDoc, where } from 'firebase/firestore';
 import { ref } from 'vue';
 
 export const useDb = () => {
@@ -13,7 +13,14 @@ export const useDb = () => {
   const getTodos = async () => {
     try {
       loading.value = true
-      const querySnapshot = await getDocs(todosCollection);
+
+      const todosQuery = query(
+        todosCollection,
+        where('uid', '==', user.value.uid)
+      )
+
+      const querySnapshot = await getDocs(todosQuery);
+
       return querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -54,7 +61,6 @@ export const useDb = () => {
   const deleteTodo = async(id) => {
     try {
       const docRef = doc(db, 'todos', id)
-
       await deleteDoc(docRef)
 
       return {
@@ -67,7 +73,7 @@ export const useDb = () => {
       }
     }
   }
-  //** **//
+  //** SWITCH TODO STATE **//
   const finishTodo = async(todo) => {
     try {
       const docRef = doc(db, 'todos', todo.id);
